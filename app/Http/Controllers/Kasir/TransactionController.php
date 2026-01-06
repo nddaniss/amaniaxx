@@ -15,7 +15,7 @@ class TransactionController extends Controller
         return view('kasir.transaksi.show', compact('transaction'));
     }
 
-    // 2. Proses Pembayaran (Update jadi PAID)
+    // 2. Proses Pembayaran (Update jadi PAID & Simpan Data Uang)
     public function markAsPaid(Request $request, $id)
     {
         $request->validate([
@@ -24,20 +24,23 @@ class TransactionController extends Controller
 
         $transaction = Transaction::findOrFail($id);
 
+        // Cek apakah uang tunai kurang dari total tagihan
         if ($request->cash_received < $transaction->final_price) {
             return back()->with('error', 'Uang tunai kurang!');
         }
 
-        // Update Status
-        $transaction->update([
-            'status' => 'paid',
-            // Jika di database ada kolom 'payment_method' atau 'cash_received', bisa simpan disini
-            // 'payment_method' => 'cash'
-        ]);
-
-        // Kita simpan info kembalian di session flash untuk ditampilkan sekali saja
+        // Hitung Kembalian
         $kembalian = $request->cash_received - $transaction->final_price;
 
+        // UPDATE STATUS & SIMPAN DATA PEMBAYARAN
+        // Ini kuncinya agar di struk tidak muncul 0
+        $transaction->update([
+            'status' => 'paid',
+            'cash_received' => $request->cash_received, // Simpan Nominal Bayar
+            'cash_change' => $kembalian,                // Simpan Nominal Kembalian
+        ]);
+
+        // Redirect ke dashboard dengan pesan sukses
         return redirect()->route('kasir.dashboard')
             ->with('success', 'Pembayaran Berhasil! Kembalian: Rp ' . number_format($kembalian));
     }

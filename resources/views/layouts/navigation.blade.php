@@ -3,8 +3,8 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-[#8C6239]" />
+                    <a href="{{ route('dashboard') }}" class="flex items-center">
+                        <x-application-logo class="block h-10 w-auto max-h-10 object-contain fill-current text-[#8C6239]" />
                     </a>
                 </div>
 
@@ -40,14 +40,8 @@
                             {{ __('Pesan Makan') }}
                         </x-nav-link>
 
-                        {{-- MENU PROMO BARU --}}
                         <x-nav-link :href="route('customer.vouchers.index')" :active="request()->routeIs('customer.vouchers.*')">
-                            <span class="flex items-center">
                                 {{ __('Promo') }}
-                                <span class="ms-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-pink-500 text-white animate-pulse">
-                                    NEW
-                                </span>
-                            </span>
                         </x-nav-link>
                         
                         <x-nav-link :href="route('customer.cart.index')" :active="request()->routeIs('customer.cart.*')">
@@ -62,6 +56,7 @@
                 </div>
             </div>
 
+            {{-- PROFILE DROPDOWN --}}
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -93,6 +88,7 @@
                 </x-dropdown>
             </div>
 
+            {{-- HAMBURGER MENU (MOBILE) --}}
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -104,10 +100,9 @@
         </div>
     </div>
 
-    {{-- Tampilan Mobile --}}
+    {{-- RESPONSIVE MENU (MOBILE VIEW) --}}
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            
             @if(Auth::user()->role === 'admin')
                 <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
                     {{ __('Dashboard Admin') }}
@@ -121,12 +116,16 @@
                 <x-responsive-nav-link :href="route('customer.menus.index')" :active="request()->routeIs('customer.menus.*')">
                     {{ __('Pesan Makan') }}
                 </x-responsive-nav-link>
-                {{-- Promo Mobile --}}
                 <x-responsive-nav-link :href="route('customer.vouchers.index')" :active="request()->routeIs('customer.vouchers.*')">
                     {{ __('Promo Spesial') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('customer.cart.index')" :active="request()->routeIs('customer.cart.*')">
+                    {{ __('Keranjang') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('customer.history')" :active="request()->routeIs('customer.history.*')">
+                    {{ __('Riwayat') }}
+                </x-responsive-nav-link>
             @endif
-
         </div>
 
         <div class="pt-4 pb-1 border-t border-gray-200">

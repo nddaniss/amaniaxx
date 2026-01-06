@@ -12,7 +12,7 @@ use App\Http\Controllers\Kasir\DashboardController as KasirDashboard;
 use App\Http\Controllers\Kasir\TransactionController as KasirTransaction;
 use App\Http\Controllers\Customer\DashboardController as CustomerDashboard;
 use App\Http\Controllers\Customer\MenuController as CustomerMenu;
-use App\Http\Controllers\Customer\VoucherController;
+use App\Http\Controllers\Customer\VoucherController; // Pastikan ini ada
 use App\Http\Controllers\Customer\CartController;
 use App\Http\Controllers\Customer\OrderController; 
 
@@ -26,13 +26,12 @@ use App\Http\Controllers\Customer\OrderController;
 Route::get('/', function () {
     if (Auth::check()) {
         $role = Auth::user()->role;
-        // Gunakan redirect ke rute dashboard masing-masing role agar aman
         return redirect()->route($role . '.dashboard');
     }
     return view('welcome');
 })->name('homepage');
 
-// 2. DASHBOARD REDIRECTOR (Mencegah Error 404/403 saat akses /dashboard)
+// 2. DASHBOARD REDIRECTOR
 Route::get('/dashboard', function () {
     $role = Auth::user()->role;
     return redirect()->route($role . '.dashboard');
@@ -46,7 +45,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
         Route::resource('menus', AdminMenu::class);
         Route::resource('vouchers', AdminVoucher::class);
-        // Tambahkan ini agar Admin bisa melihat struk dari dashboard admin
         Route::get('/struk/{id}', [KasirTransaction::class, 'downloadStruk'])->name('struk');
     });
 
@@ -58,27 +56,29 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/struk/{id}', [KasirTransaction::class, 'downloadStruk'])->name('struk');
     });
 
-    
     // --- CUSTOMER ROUTES ---
     Route::middleware('role:customer')->prefix('customer')->name('customer.')->group(function () {
         Route::get('/dashboard', [CustomerDashboard::class, 'index'])->name('dashboard');
         Route::get('/menus', [CustomerMenu::class, 'index'])->name('menus.index');
+        Route::get('/vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
     
-    // Keranjang Belanja
-    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart/add/{id}', [CartController::class, 'addToCart'])->name('cart.add');
-    Route::delete('/cart/remove/{id}', [CartController::class, 'destroy'])->name('cart.remove');
-    
-    // --- FITUR VOUCHER BARU ---
-    Route::post('/cart/apply-voucher', [CartController::class, 'applyVoucher'])->name('cart.apply_voucher');
-    Route::post('/cart/remove-voucher', [CartController::class, 'removeVoucher'])->name('cart.remove_voucher');
-    // --------------------------
+        // Keranjang Belanja
+        Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+        Route::post('/cart/add/{id}', [CartController::class, 'addToCart'])->name('cart.add');
+        Route::delete('/cart/remove/{id}', [CartController::class, 'destroy'])->name('cart.remove');
+        
+        // --- LOGIKA VOUCHER BARU (Diarahkan ke VoucherController) ---
+        // Ini rute yang baru kita perbaiki:
+        Route::post('/voucher/apply', [VoucherController::class, 'apply'])->name('voucher.apply');
+        
+        // Hapus voucher (tetap di CartController atau bisa dipindah jika mau)
+        Route::post('/cart/remove-voucher', [CartController::class, 'removeVoucher'])->name('cart.remove_voucher');
+        // --------------------------
 
-    Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
-    Route::get('/riwayat', [OrderController::class, 'index'])->name('history');
-    Route::get('/riwayat/struk/{id}', [OrderController::class, 'downloadStruk'])->name('struk');
-    Route::get('/vouchers', [VoucherController::class, 'index'])->name('vouchers.index');
-});
+        Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+        Route::get('/riwayat', [OrderController::class, 'index'])->name('history');
+        Route::get('/riwayat/struk/{id}', [OrderController::class, 'downloadStruk'])->name('struk');
+    });
 
     // --- PROFILE MANAGEMENT ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

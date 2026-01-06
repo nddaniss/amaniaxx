@@ -8,7 +8,7 @@
     <div class="py-12 bg-[#F7C8E0] min-h-screen">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-            {{-- ALERT VOUCHER --}}
+            {{-- ALERT --}}
             @if(session('success'))
                 <div class="bg-green-50 border-l-4 border-green-500 text-green-700 px-6 py-4 rounded-2xl shadow-sm mb-6 flex items-center animate-pulse" role="alert">
                     <i class="fa-solid fa-circle-check mr-3"></i>
@@ -60,14 +60,16 @@
                             </table>
                         </div>
 
-                        {{-- SEKSI VOUCHER --}}
+                        {{-- SEKSI VOUCHER (SUDAH DIPERBAIKI) --}}
                         <div class="mt-8 bg-white p-6 rounded-2xl border-2 border-dashed border-pink-200">
                             <h4 class="text-[10px] font-black text-[#8C6239] uppercase tracking-[0.2em] mb-3">Gunakan Kode Promo</h4>
                             
                             <div class="flex flex-col sm:flex-row gap-3">
-                                <form action="{{ route('customer.cart.apply_voucher') }}" method="POST" class="flex-1 flex gap-3">
+                                {{-- PERBAIKAN 1: Route diarahkan ke customer.voucher.apply --}}
+                                <form action="{{ route('customer.voucher.apply') }}" method="POST" class="flex-1 flex gap-3">
                                     @csrf
-                                    <input type="text" name="voucher_code" placeholder="Ketik kode voucher di sini..." 
+                                    {{-- PERBAIKAN 2: name diganti jadi "code" --}}
+                                    <input type="text" name="code" placeholder="Ketik kode voucher di sini..." 
                                         class="flex-1 bg-pink-50/50 border-pink-100 rounded-xl text-sm focus:ring-[#e75480] focus:border-[#e75480] placeholder-pink-300 font-bold"
                                         {{ session('voucher') ? 'readonly' : '' }} value="{{ session('voucher')['code'] ?? '' }}">
                                     
@@ -100,9 +102,10 @@
                             <div class="mb-4 md:mb-0 text-center md:text-left">
                                 @if(session('voucher'))
                                     <p class="text-[10px] text-gray-400 line-through font-bold">Total: Rp {{ number_format($total, 0, ',', '.') }}</p>
-                                    <p class="text-[10px] text-green-600 font-black uppercase tracking-widest">Diskon: - Rp {{ number_format(session('voucher')['discount'], 0, ',', '.') }}</p>
+                                    {{-- PERBAIKAN 3: Menggunakan key ['amount'] bukan ['discount'] --}}
+                                    <p class="text-[10px] text-green-600 font-black uppercase tracking-widest">Diskon: - Rp {{ number_format(session('voucher')['amount'], 0, ',', '.') }}</p>
                                     <h3 class="text-3xl font-black text-[#e75480]">
-                                        Rp {{ number_format($total - session('voucher')['discount'], 0, ',', '.') }}
+                                        Rp {{ number_format($total - session('voucher')['amount'], 0, ',', '.') }}
                                     </h3>
                                 @else
                                     <p class="text-[10px] text-[#8C6239] font-black uppercase tracking-widest">Total Bayar</p>
@@ -119,7 +122,6 @@
                                 
                                 <form action="{{ route('customer.checkout') }}" method="POST" class="w-full">
                                     @csrf
-                                    {{-- Kirim kode voucher yang aktif ke controller checkout --}}
                                     @if(session('voucher'))
                                         <input type="hidden" name="voucher_code" value="{{ session('voucher')['code'] }}">
                                     @endif
@@ -132,7 +134,7 @@
                             </div>
                         </div>
                     @else
-                        {{-- EMPTY STATE (Sama seperti sebelumnya) --}}
+                        {{-- EMPTY STATE --}}
                         <div class="text-center py-20">
                             <div class="relative inline-block mb-6">
                                 <i class="fa-solid fa-cart-shopping text-8xl text-pink-100"></i>

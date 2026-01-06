@@ -13,7 +13,7 @@
                 <div class="p-8 text-gray-900 flex justify-between items-center">
                     <div>
                         <h3 class="text-2xl font-bold text-gray-800 font-['Playfair_Display']">Selamat Datang, Admin!</h3>
-                        <p class="text-sm text-gray-500 mt-1">Berikut adalah ringkasan performa <span class="text-[#8C6239] font-bold">Amaniax Cafe</span> hari ini.</p>
+                        <p class="text-sm text-gray-500 mt-1">Berikut adalah ringkasan performa <span class="text-[#8C6239] font-bold">Amaniax Cafe</span>.</p>
                     </div>
                     <div class="hidden md:block">
                         <i class="fa-solid fa-chart-line text-4xl text-gray-100"></i>

@@ -41,7 +41,7 @@
     <div class="info">
         No: {{ $transaction->transaction_code }}<br>
         Tgl: {{ $transaction->created_at->format('d/m/Y H:i') }}<br>
-        Kasir: {{ Auth::user()->name }}<br>
+        Kasir: Jepri<br>
         Pelanggan: {{ $transaction->user->name ?? 'Guest' }}
     </div>
     <br>
@@ -59,36 +59,40 @@
             <tr>
                 <td>{{ $detail->menu->name }}</td>
                 <td class="text-center">{{ $detail->quantity }}</td>
-                <td class="text-right">{{ number_format($detail->price_per_item * $detail->quantity) }}</td>
+                <td class="text-right">{{ number_format($detail->price_per_item * $detail->quantity, 0, ',', '.') }}</td>
             </tr>
             @endforeach
         </tbody>
         <tfoot>
-            {{-- Bagian Diskon Sinkron --}}
             @if($transaction->discount_amount > 0)
             <tr>
                 <td colspan="2" style="padding-top:10px;">Subtotal</td>
-                <td class="text-right" style="padding-top:10px;">{{ number_format($transaction->total_price) }}</td>
+                <td class="text-right" style="padding-top:10px;">{{ number_format($transaction->total_price, 0, ',', '.') }}</td>
             </tr>
             <tr>
-                <td colspan="2">Diskon Voucher</td>
-                <td class="text-right">-{{ number_format($transaction->discount_amount) }}</td>
+                <td colspan="2" style="color: #16a34a; font-style: italic;">Diskon Voucher</td>
+                <td class="text-right" style="color: #16a34a;">-{{ number_format($transaction->discount_amount, 0, ',', '.') }}</td>
             </tr>
             @endif
 
             <tr class="total-row">
                 <td colspan="2">TOTAL AKHIR</td>
-                <td class="text-right">Rp {{ number_format($transaction->final_price) }}</td>
+                <td class="text-right">Rp {{ number_format($transaction->final_price, 0, ',', '.') }}</td>
             </tr>
 
-            {{-- Detail Pembayaran Tunai --}}
+            {{-- DETAIL PEMBAYARAN & KEMBALIAN --}}
             <tr>
                 <td colspan="2" style="padding-top:5px;">Tunai</td>
-                <td class="text-right" style="padding-top:5px;">{{ number_format($transaction->cash_received ?? 0) }}</td>
+                <td class="text-right" style="padding-top:5px;">
+                    {{ number_format($transaction->cash_received ?? $transaction->final_price, 0, ',', '.') }}
+                </td>
             </tr>
             <tr>
-                <td colspan="2">Kembalian</td>
-                <td class="text-right">{{ number_format($transaction->cash_change ?? 0) }}</td>
+                <td colspan="2" style="font-weight: bold;">Kembalian</td>
+                <td class="text-right" style="font-weight: bold;">
+                    {{-- Rumus Kembalian Otomatis --}}
+                    Rp {{ number_format(($transaction->cash_received ?? $transaction->final_price) - $transaction->final_price, 0, ',', '.') }}
+                </td>
             </tr>
             <tr>
                 <td colspan="2" style="padding-top:5px;">STATUS</td>
@@ -98,19 +102,18 @@
     </table>
 
     <div class="footer">
+        <p>*** LUNAS ***</p>
         <p>Terima Kasih atas Kunjungan Anda!</p>
+        <p>Voucher hanya dapat digunakan 1x/akun.</p>
         <p>Amaniax Cafe - Sweet Moments.</p>
         <p style="margin-top:5px;">Follow IG: @amaniax.cafe</p>
     </div>
 
     <div class="no-print" style="text-align: center; margin-top: 30px; border-top: 2px solid #eee; padding-top: 20px;">
-        <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer; background: #333; color: white; border: none; border-radius: 5px;">
+        <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer; background: #8C6239; color: white; border: none; border-radius: 5px;">
             Print Ulang
         </button>
         <br><br>
-        <a href="{{ route('kasir.dashboard') }}" style="text-decoration: none; color: #8C6239; font-weight: bold;">
-            &larr; Kembali ke Dashboard
-        </a>
     </div>
 
 </body>

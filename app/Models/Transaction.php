@@ -12,10 +12,13 @@ class Transaction extends Model
     protected $fillable = [
         'user_id',
         'transaction_code',
+        'voucher_id',
         'total_price',
         'discount_amount',
         'final_price',
         'status',
+        'cash_received',
+        'cash_change',
     ];
 
     // Relasi: Transaksi ini milik siapa? (User/Customer)
